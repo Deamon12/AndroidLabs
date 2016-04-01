@@ -44,7 +44,8 @@ public class MyActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-
+            Snackbar.make(findViewById(R.id.shit), "settings", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
             return true;
         }
 
