@@ -264,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
             viewHolder.nameView.setText(dataSet.get(position).getName());
+            //viewHolder.idView.setText((dataSet.get(position).getId()+""));
 
         }
 
@@ -275,12 +276,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
             public TextView nameView;
+            public TextView idView;
 
             //Declare views here, dont fill them
             public ViewHolder(View itemView) {
                 super(itemView);
 
-                nameView = (TextView) itemView.findViewById(R.id.the_textview);
+                nameView = (TextView) itemView.findViewById(R.id.the_name);
+                idView = (TextView) itemView.findViewById(R.id.the_id);
 
                 itemView.setOnClickListener(this);
                 itemView.setOnLongClickListener(this);
@@ -288,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onClick(View v) {
-                System.out.println("Clicked: " + dataSet.get(getAdapterPosition()).getId());
 
                 showClickedDialog(getAdapterPosition());
 
