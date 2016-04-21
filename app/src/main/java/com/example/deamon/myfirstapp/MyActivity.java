@@ -1,16 +1,25 @@
 package com.example.deamon.myfirstapp;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,6 +32,7 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private ProgressBar progressBar;
     private ArrayList<People> peopleNames;
 
 
@@ -45,11 +55,44 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
 
+        progressBar = (ProgressBar) findViewById(R.id.the_progressBar);
+        progressBar.setVisibility(View.GONE);
+
 
         readDatabase();
 
 
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_my, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_fibonacci:
+                doFibonacci();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void doFibonacci() {
+        progressBar.setVisibility(View.VISIBLE);
+        new FibTask().execute("");
+
+    }
+
+    private void setProgressPercent(Integer progress) {
+        progressBar.setProgress(progress);
     }
 
 
@@ -86,6 +129,16 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
         mydatabase.close();
 
     }
+
+    public void updateDatabase(int idToEdit, String nameToEdit) {
+
+        SQLiteDatabase mydatabase = openOrCreateDatabase("PeopleDB", MODE_PRIVATE, null);
+        mydatabase.execSQL("UPDATE People SET name = '"+nameToEdit+"' WHERE Id = '" + idToEdit + "'");
+        mydatabase.close();
+        readDatabase();
+
+    }
+
 
 
     private void populateRecyclerView() {
@@ -174,6 +227,86 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
     }
 
 
+
+
+    private void showClickedDialog(final int index) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("What to do...");
+
+        builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+                showEditDialog(index);
+
+            }
+        });
+        builder.setNegativeButton("Remove", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+                removeFromDatabase(peopleNames.get(index).getId());
+                readDatabase();
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+
+        builder.show();
+    }
+
+
+    private void showEditDialog(final int index) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Update person name");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_TEXT);
+        input.setText(peopleNames.get(index).getName());
+        builder.setView(input);
+
+        builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                updateDatabase(peopleNames.get(index).getId(), input.getText().toString());
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+
+        builder.show();
+
+    }
+
+    private void showFibSequence(String sequence) {
+
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Fib Sequence...");
+
+        final TextView seqText = new TextView(this);
+        seqText.setText(sequence);
+        builder.setView(seqText);
+
+        builder.setPositiveButton("Cool", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
+
+
+        builder.show();
+
+
+    }
+
+
     class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder> {
 
         private int rowLayout;
@@ -194,6 +327,7 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
             viewHolder.nameView.setText(dataSet.get(position).getName());
+            //viewHolder.idView.setText((dataSet.get(position).getId()+""));
 
         }
 
@@ -205,12 +339,14 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
             public TextView nameView;
+            public TextView idView;
 
             //Declare views here, dont fill them
             public ViewHolder(View itemView) {
                 super(itemView);
 
-                nameView = (TextView) itemView.findViewById(R.id.the_textview);
+                nameView = (TextView) itemView.findViewById(R.id.the_name);
+                idView = (TextView) itemView.findViewById(R.id.the_id);
 
                 itemView.setOnClickListener(this);
                 itemView.setOnLongClickListener(this);
@@ -218,7 +354,8 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
 
             @Override
             public void onClick(View v) {
-                System.out.println("Clicked: " + dataSet.get(getAdapterPosition()).getId());
+
+                showClickedDialog(getAdapterPosition());
 
             }
 
@@ -227,7 +364,6 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
 
                 removeFromDatabase(dataSet.get(getAdapterPosition()).getId());
                 dataSet.remove(getAdapterPosition());
-
                 mAdapter.notifyDataSetChanged();
 
                 return false;
@@ -238,6 +374,44 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
     }
 
 
-}
 
+
+    private class FibTask extends AsyncTask<String, Integer, String> {
+        protected String doInBackground(String... urls) {
+
+            String sequence = "0 1";
+            long varA = 0;
+            long varB = 1;
+            long sum = 0;
+
+            int i;
+            for (i = 0; i < 1000; i++) {
+
+                sum = varA + varB;
+                varA = varB;
+                varB = sum;
+
+                sequence = sequence +" "+ sum;
+
+                publishProgress(i);
+                if (isCancelled()) break;
+            }
+
+
+            return sequence;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+            setProgressPercent(progress[0]);
+        }
+
+        protected void onPostExecute(String result) {
+            showFibSequence(result);
+
+        }
+    }
+
+
+
+}
 
