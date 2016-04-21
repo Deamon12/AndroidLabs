@@ -1,22 +1,26 @@
 package com.example.deamon.myfirstapp;
 
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MyActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
@@ -44,7 +48,6 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
         mRecyclerView.setLayoutManager(mLayoutManager);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
-
 
         readDatabase();
 
@@ -86,6 +89,16 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
         mydatabase.close();
 
     }
+
+    public void updateDatabase(int idToEdit, String nameToEdit) {
+
+        SQLiteDatabase mydatabase = openOrCreateDatabase("PeopleDB", MODE_PRIVATE, null);
+        mydatabase.execSQL("UPDATE People SET name = '"+nameToEdit+"' WHERE Id = '" + idToEdit + "'");
+        mydatabase.close();
+        readDatabase();
+
+    }
+
 
 
     private void populateRecyclerView() {
@@ -174,6 +187,63 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
     }
 
 
+
+
+    private void showClickedDialog(final int index) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("What to do...");
+
+        builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+                showEditDialog(index);
+
+            }
+        });
+        builder.setNegativeButton("Remove", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+                removeFromDatabase(peopleNames.get(index).getId());
+                readDatabase();
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+
+        builder.show();
+    }
+
+
+    private void showEditDialog(final int index) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Update person name");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_TEXT);
+        input.setText(peopleNames.get(index).getName());
+        builder.setView(input);
+
+        builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                updateDatabase(peopleNames.get(index).getId(), input.getText().toString());
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+
+        builder.show();
+
+    }
+
+
     class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder> {
 
         private int rowLayout;
@@ -220,6 +290,8 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
             public void onClick(View v) {
                 System.out.println("Clicked: " + dataSet.get(getAdapterPosition()).getId());
 
+                showClickedDialog(getAdapterPosition());
+
             }
 
             @Override
@@ -227,7 +299,6 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
 
                 removeFromDatabase(dataSet.get(getAdapterPosition()).getId());
                 dataSet.remove(getAdapterPosition());
-
                 mAdapter.notifyDataSetChanged();
 
                 return false;
@@ -236,6 +307,8 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
 
 
     }
+
+
 
 
 }
