@@ -1,54 +1,243 @@
 package com.example.deamon.myfirstapp;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-public class MyActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.Random;
+
+public class MyActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private FloatingActionButton fab;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    private ArrayList<People> peopleNames;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my);
+        setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "SnackBar", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(this);
+
+
+        readDatabase();
+
+
+
+    }
+
+
+    private void readDatabase() {
+
+        SQLiteDatabase mydatabase = openOrCreateDatabase("PeopleDB", MODE_PRIVATE, null);
+        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS People (Id INTEGER PRIMARY KEY, Name VARCHAR(32))");
+
+        Cursor dbResult = mydatabase.rawQuery("SELECT * FROM People", null);
+
+
+        if (dbResult.getCount() > 0) {
+
+            dbResult.moveToFirst();
+            peopleNames = new ArrayList<>();
+
+            for (int a = 0; a < dbResult.getCount(); a++) {
+
+                peopleNames.add(new People(dbResult.getInt(0), dbResult.getString(1)));
+                dbResult.moveToNext();
             }
-        });
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_my, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Snackbar.make(findViewById(R.id.shit), "settings", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            return true;
+            populateRecyclerView();
         }
 
-        return super.onOptionsItemSelected(item);
+        mydatabase.close();
+
     }
+
+    public void removeFromDatabase(int idToRemove) {
+
+        SQLiteDatabase mydatabase = openOrCreateDatabase("PeopleDB", MODE_PRIVATE, null);
+        mydatabase.execSQL("DELETE FROM People WHERE Id = '" + idToRemove + "'");
+        mydatabase.close();
+
+    }
+
+
+    private void populateRecyclerView() {
+
+        mAdapter = new RecycleViewAdapter(R.layout.card_layout, peopleNames);
+        mRecyclerView.setAdapter(mAdapter);
+
+    }
+
+
+    private void createAndAddPerson() {
+
+        SQLiteDatabase mydatabase = openOrCreateDatabase("PeopleDB", MODE_PRIVATE, null);
+        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS People(Id INTEGER PRIMARY KEY, Name VARCHAR(32))");
+
+        int gender = new Random().nextInt(2);
+
+        if (gender == 1) {
+            mydatabase.execSQL("INSERT INTO People VALUES('" + new Random().nextInt() + "','" + getBoyName() + "');");
+        } else {
+            mydatabase.execSQL("INSERT INTO People VALUES('" + new Random().nextInt() + "','" + getGirlName() + "');");
+        }
+
+        mydatabase.close();
+
+
+    }
+
+    private String getBoyName() {
+
+        String[] names = {
+                "Hoyt",
+                "Darrin",
+                "Bret",
+                "Harland",
+                "Cletus",
+                "Galen",
+                "Shaun",
+                "Terrance",
+                "Gregg",
+                "Angelo",
+                "Lacy",
+                "Zachariah",
+                "Demetrius",
+                "Renaldo"};
+
+        int index = new Random().nextInt(names.length);
+
+        return names[index];
+    }
+
+    private String getGirlName() {
+
+        String[] names = {
+                "Corene",
+                "Lyn",
+                "Zulma",
+                "Cicely",
+                "Tonie",
+                "Marcia",
+                "Shawanna",
+                "Lavonna",
+                "Kiesha",
+                "Maud",
+                "Karma",
+                "Rosenda",
+                "Magdalena",
+                "Mariela",
+                "Luz",
+                "Margret",
+                "Camellia"};
+
+        int index = new Random().nextInt(names.length);
+
+        return names[index];
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == fab) {
+
+            createAndAddPerson();
+            readDatabase();
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+
+    class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder> {
+
+        private int rowLayout;
+        private ArrayList<People> dataSet;
+
+        public RecycleViewAdapter(int rowLayout, ArrayList dataSet) {
+            this.rowLayout = rowLayout;
+            this.dataSet = dataSet;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View v = LayoutInflater.from(viewGroup.getContext()).inflate(rowLayout, viewGroup, false);
+            return new ViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder viewHolder, int position) {
+
+            viewHolder.nameView.setText(dataSet.get(position).getName());
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return dataSet.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+            public TextView nameView;
+
+            //Declare views here, dont fill them
+            public ViewHolder(View itemView) {
+                super(itemView);
+
+                nameView = (TextView) itemView.findViewById(R.id.the_textview);
+
+                itemView.setOnClickListener(this);
+                itemView.setOnLongClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                System.out.println("Clicked: " + dataSet.get(getAdapterPosition()).getId());
+
+            }
+
+            @Override
+            public boolean onLongClick(View v) {
+
+                removeFromDatabase(dataSet.get(getAdapterPosition()).getId());
+                dataSet.remove(getAdapterPosition());
+
+                mAdapter.notifyDataSetChanged();
+
+                return false;
+            }
+        }
+
+
+    }
+
+
 }
+
+
