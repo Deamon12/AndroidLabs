@@ -1,6 +1,7 @@
 package com.example.deamon.myfirstapp;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -79,6 +80,10 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
         switch (item.getItemId()) {
             case R.id.action_fibonacci:
                 doFibonacci();
+                return true;
+            case R.id.action_styling:
+                Intent tableViewActivity = new Intent(MyActivity.this, StylingActivity.class);
+                startActivity(tableViewActivity);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

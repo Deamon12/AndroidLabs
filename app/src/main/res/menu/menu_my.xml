@@ -7,4 +7,11 @@
         android:orderInCategory="100"
         android:title="Fibonacci"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_styling"
+        android:orderInCategory="100"
+        android:title="StylingActivity"
+        app:showAsAction="never" />
+
 </menu>
