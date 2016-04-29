@@ -26,7 +26,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MyActivity extends AppCompatActivity implements View.OnClickListener {
+public class NamesActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FloatingActionButton fab;
     private RecyclerView mRecyclerView;
@@ -82,8 +82,12 @@ public class MyActivity extends AppCompatActivity implements View.OnClickListene
                 doFibonacci();
                 return true;
             case R.id.action_styling:
-                Intent tableViewActivity = new Intent(MyActivity.this, StylingActivity.class);
+                Intent tableViewActivity = new Intent(NamesActivity.this, StylingActivity.class);
                 startActivity(tableViewActivity);
+                return true;
+            case R.id.action_netlab:
+                Intent netLabActivity = new Intent(NamesActivity.this, NetLabActivity.class);
+                startActivity(netLabActivity);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

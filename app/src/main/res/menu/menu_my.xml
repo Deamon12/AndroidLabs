@@ -14,4 +14,10 @@
         android:title="StylingActivity"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_netlab"
+        android:orderInCategory="100"
+        android:title="NetLabActivity"
+        app:showAsAction="never" />
+
 </menu>

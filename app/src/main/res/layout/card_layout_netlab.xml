@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp">
+
+        <TextView
+            android:id="@+id/the_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="Title"
+            android:textColor="@color/primary"
+            android:textSize="20sp"
+            android:padding="5dp" />
+
+
+        <TextView
+            android:id="@+id/the_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/the_title"
+            android:text="TESTING"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/the_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/the_link"
+            android:text="Descript"
+            android:padding="5dp"/>
+
+    </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+
