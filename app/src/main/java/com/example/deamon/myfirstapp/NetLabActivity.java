@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -139,13 +140,16 @@ public class NetLabActivity extends AppCompatActivity implements View.OnClickLis
 
         try {
 
+
             resultsArray = response.getJSONObject("responseData").getJSONArray("results");
+            System.out.println("resultsArray: "+response);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        populateRecyclerView();
+        if(resultsArray != null && resultsArray.length() > 0)
+            populateRecyclerView();
 
 
     }
@@ -153,6 +157,7 @@ public class NetLabActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onErrorResponse(VolleyError error) {
 
+        Toast.makeText(this, "Error searching for "+editText.getText(), Toast.LENGTH_LONG).show();
     }
 
 

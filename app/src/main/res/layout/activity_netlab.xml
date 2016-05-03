@@ -20,6 +20,7 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_below="@+id/toolbar"
         android:id="@+id/editText"
+        android:hint="Search"
         android:layout_toLeftOf="@+id/search_button"/>
 
     <Button
