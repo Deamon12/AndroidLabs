@@ -20,4 +20,10 @@
         android:title="NetLabActivity"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_map"
+        android:orderInCategory="100"
+        android:title="MapActivity"
+        app:showAsAction="never" />
+
 </menu>

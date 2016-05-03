@@ -89,6 +89,10 @@ public class NamesActivity extends AppCompatActivity implements View.OnClickList
                 Intent netLabActivity = new Intent(NamesActivity.this, NetLabActivity.class);
                 startActivity(netLabActivity);
                 return true;
+            case R.id.action_map:
+                Intent mapActivity = new Intent(NamesActivity.this, MapActivity.class);
+                startActivity(mapActivity);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
