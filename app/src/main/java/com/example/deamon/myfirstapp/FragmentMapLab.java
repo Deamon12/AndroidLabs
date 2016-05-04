@@ -79,7 +79,7 @@ public class FragmentMapLab extends Fragment implements OnMapReadyCallback, Goog
     public void onInfoWindowClick(Marker marker) {
         System.out.println("Marker: " + marker.getTitle());
         System.out.println("Marker: " + marker.getId().substring(1));
-        Intent intent = new Intent(getActivity(), LocationActivity.class);
+        Intent intent = new Intent(getActivity(), ActivityLocation.class);
         intent.putExtra("locationName", marker.getTitle());
         startActivity(intent);
     }

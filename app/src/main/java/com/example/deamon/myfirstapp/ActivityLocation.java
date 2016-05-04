@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.webkit.WebView;
 
-public class LocationActivity extends AppCompatActivity {
+public class ActivityLocation extends AppCompatActivity {
 
     private WebView mWebView;
 
