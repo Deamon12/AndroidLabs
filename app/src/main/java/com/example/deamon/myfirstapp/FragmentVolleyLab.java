@@ -1,16 +1,11 @@
 package com.example.deamon.myfirstapp;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,7 +25,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public class NetLabActivity extends AppCompatActivity implements View.OnClickListener, Response.ErrorListener, Response.Listener<JSONObject> {
+public class FragmentVolleyLab extends Fragment implements View.OnClickListener, Response.ErrorListener, Response.Listener<JSONObject> {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -43,58 +38,32 @@ public class NetLabActivity extends AppCompatActivity implements View.OnClickLis
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_netlab);
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
-        setSupportActionBar(toolbar);
+        View rootView = inflater.inflate(R.layout.fragment_volley, container, false);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        searchButton = (Button) findViewById(R.id.search_button);
+        searchButton = (Button) rootView.findViewById(R.id.search_button);
         searchButton.setOnClickListener(this);
 
-        editText = (EditText) findViewById(R.id.editText);
+        editText = (EditText) rootView.findViewById(R.id.editText);
         editText.setOnClickListener(this);
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         if (!Singleton.hasBeenInitialized()) {
-            Singleton.initialize(this);
+            Singleton.initialize(getActivity());
         }
 
         doSearch("");
 
-
-
+        return rootView;
     }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        //inflater.inflate(R.menu.menu_my, menu);
-        return true;
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_styling:
-                Intent tableViewActivity = new Intent(NetLabActivity.this, StylingActivity.class);
-                startActivity(tableViewActivity);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
 
 
     private void doSearch(String query){
@@ -119,16 +88,13 @@ public class NetLabActivity extends AppCompatActivity implements View.OnClickLis
         }
 
 
-        System.out.println("url: "+url);
+        System.out.println("url: " + url);
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET,
                 url, (JSONObject) null, this, this);
 
 
         Singleton.getInstance().addToRequestQueue(jsObjRequest);
     }
-
-
-
 
     private void populateRecyclerView() {
 
@@ -137,17 +103,11 @@ public class NetLabActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-
-
-
-
-
     @Override
     public void onClick(View v) {
         if(v == searchButton){
             doSearch(editText.getText().toString());
         }
-
     }
 
 
@@ -172,11 +132,8 @@ public class NetLabActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onErrorResponse(VolleyError error) {
         System.out.println("error: "+error);
-        Toast.makeText(this, "Error searching for "+editText.getText(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "Error searching for " + editText.getText(), Toast.LENGTH_LONG).show();
     }
-
-
-
 
     class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ViewHolder> {
 
@@ -239,10 +196,4 @@ public class NetLabActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-
-
-
-
-
 }
-
